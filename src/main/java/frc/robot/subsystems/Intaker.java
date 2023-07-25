@@ -25,18 +25,15 @@ public class Intaker extends Subsystem {
     private final double ZERO_TIME = 0.5; // 复位堵转时间;
     private final double SHOOT_VELTICK = 10000;
 
-    public double extend_tick = 0;
-
     public double lastTranferFullTime = Double.NEGATIVE_INFINITY;
     public boolean lastTransferFull = false;
 
     public double lastNotShootingTime = Double.POSITIVE_INFINITY;
 
     public boolean offload_spin = false;
-    private double feed_outperc = 0.0;
 
     public enum IntakerState {
-        HOME, INTAKE, FEED
+        HOME, INTAKE, FEED, HOLDBALL, OUTTAKE
     }
 
     private boolean extend_initialized = true;
@@ -135,7 +132,7 @@ public class Intaker extends Subsystem {
 
         // OUTPUTS
         public double roller_demand, extend_demand;
-        public ControlMode roller_mode = ControlMode.PercentOutput, extend_mode = ControlMode.PercentOutput, feeder_mode=ControlMode.PercentOutput;
+        public ControlMode roller_mode = ControlMode.PercentOutput, extend_mode = ControlMode.PercentOutput;
     }
 
     @Override
@@ -196,7 +193,6 @@ public class Intaker extends Subsystem {
                 mIntakeExtend.configMotionCruiseVelocity(3000);
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = 2000 + 1500*Math.sin(2*Math.PI*Timer.getFPGATimestamp());
-                mPeriodicIO.feeder_mode = ControlMode.PercentOutput;
                 mPeriodicIO.roller_mode = ControlMode.PercentOutput;
                 mPeriodicIO.roller_demand = 0.0;
                 break;
@@ -204,7 +200,6 @@ public class Intaker extends Subsystem {
                 mIntakeExtend.configMotionCruiseVelocity(3000);
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = 0;
-                mPeriodicIO.feeder_mode = ControlMode.PercentOutput;
                 if(mPeriodicIO.extend_pos > 2000){
                     mPeriodicIO.roller_demand = 0.05;
                 }else{
@@ -216,16 +211,23 @@ public class Intaker extends Subsystem {
                 mIntakeExtend.configMotionCruiseVelocity(3000);
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK;
-                mPeriodicIO.feeder_mode = ControlMode.PercentOutput;
                 mPeriodicIO.roller_mode = ControlMode.PercentOutput;
                 mPeriodicIO.roller_demand = mPeriodicIO.extend_pos > 2000? 0.20:0;
                 break;
+            case HOLDBALL:
+                mPeriodicIO.extend_mode = ControlMode.MotionMagic;
+                mPeriodicIO.extend_demand = EXTEND_TICK;
+                mPeriodicIO.roller_mode = ControlMode.PercentOutput;
+                mPeriodicIO.roller_demand = 0;
+            case OUTTAKE:
+                mPeriodicIO.extend_mode = ControlMode.MotionMagic;
+                mPeriodicIO.extend_demand = EXTEND_TICK + 1000;
+                mPeriodicIO.roller_mode = ControlMode.PercentOutput;
+                mPeriodicIO.roller_demand = -0.25;
             default:
                 break;
 
         }
-        // mPeriodicIO.extend_mode = ControlMode.PercentOutput;
-        // mPeriodicIO.extend_demand = 0;
     }
 
     @Override
@@ -249,18 +251,23 @@ public class Intaker extends Subsystem {
 
     }
 
+    public synchronized void setHoldBall() {
+        if (mIntakerState != IntakerState.HOLDBALL) {
+            mIntakerState = IntakerState.HOLDBALL;
+        }
+    }
+
+    public synchronized void setOuttake() {
+        if (mIntakerState != IntakerState.OUTTAKE) {
+            mIntakerState = IntakerState.OUTTAKE;
+        }
+    }
+
     public synchronized void setHome() {
         if (mIntakerState != IntakerState.HOME) {
             mIntakerState = IntakerState.HOME;
         }
 
-    }
-
-    public synchronized void setFeed(double outperc) {
-        if (mIntakerState != IntakerState.FEED) {
-            mIntakerState = IntakerState.FEED;
-        }
-        feed_outperc = outperc;
     }
 
     public IntakerState getState() {

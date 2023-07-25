@@ -30,7 +30,7 @@ public class Transfer extends Subsystem {
     private PicoColorSensor top_colorsensor;
 
     public enum TransferState {
-        STOP, INDEXING, PREPARE_TO_SHOOT, DELIVERING, INTAKING;
+        STOP, INDEXING, PREPARE_TO_SHOOT, DELIVERING, INTAKING, OUTTAKING, HOLDINGBALL;
     }
 
     private static Transfer mInstance;
@@ -175,7 +175,11 @@ public class Transfer extends Subsystem {
     private TransferState determineState() {
         IntakerState mIntakerState = Intaker.getInstance().getState();
         SuperStructureState mSSState = SuperStructure.getInstance().getState();
-        if (mSSState == SuperStructureState.SHOOTING) {
+        if (mIntakerState == IntakerState.HOLDBALL) {
+            return TransferState.HOLDINGBALL;
+        } else if (mIntakerState == IntakerState.OUTTAKE) {
+            return TransferState.OUTTAKING;
+        } else if (mSSState == SuperStructureState.SHOOTING) {
             return TransferState.DELIVERING;
         } else if (mIntakerState == IntakerState.INTAKE) {
             return TransferState.INTAKING;

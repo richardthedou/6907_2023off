@@ -3,11 +3,9 @@ package frc.robot.devices;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib6907.geometry.GTranslation2d;
-import frc.lib6907.util.EnhancedBoolean;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.SwerveControllerTest;
-import frc.robot.util.Util;
 
 public class ControlInput {
     private final SwerveControllerTest mDriver = new SwerveControllerTest(Constants.DRIVEIO_PORT);
@@ -19,42 +17,22 @@ public class ControlInput {
     private boolean pigeonReset;
     private boolean slowMode;
     private boolean reinitialize;
-    private double drive_pov;
-    private boolean aim;
 
-    //hangar
-    private double hangar_high_perc, hangar_low_perc;
-    private boolean hangar_high_stab, hangar_low_stab, hangar_low_stab2;
-    
-    private boolean hangar_is_ready, hang_mid, hang_high, hang_traverse, hangar_reset;
-    private boolean hangar_set_manual = false;
+
+
+    //Hangar
+    private boolean riseLift, lowerLift;
 
     //shooter
-    private boolean autoAimAndShoot, BoeingShoot, launchpadShoot;
+    private boolean autoAimAndShoot;
     private double manualTurret = Double.NaN;
-    private boolean rapidReactMode;
-    private double lastDrivePOV = -1;
+    private boolean fixedShoot;
 
     //intaker
-    private boolean carryBall;
-    private EnhancedBoolean intake = new EnhancedBoolean();
-    private boolean compressor_digital = true;
     private boolean home;
-    private boolean shoot;
     private boolean intaking;
-    private boolean vision;
-    private boolean offload_stop;
-    private boolean load;
-
-    private double arm_perc;
-    private double arm_x = 0, arm_y=0, arm_z = 0.15;
-    private double arm_vx = 0, arm_vy = 0, arm_vz = 0;
-
-    //operator
-    private double operator_left_x, operator_left_y, operator_right_x, operator_right_y, operator_trigger;
-    private boolean opOffLoad = false;
-    private boolean op_a, op_b, op_x, op_y, op_start, op_rb, op_lb;
-    private double op_pov;
+    private boolean holdBall;
+    private boolean outtake;
 
     public static ControlInput getInstance() {
         if (sInstance == null)
@@ -73,39 +51,15 @@ public class ControlInput {
         drive_targetAngle = mDriver.getDriveTargetAngle();
         slowMode = mDriver.getSlowMode();
 
-        home = mDriver.getLeftBumperPressed();
-        intaking = mDriver.getAButtonPressed();
-        shoot = mDriver.getDriver().getBButton();
-        load = mDriver.getDriver().getXButton();
-        // offload = mDriver.getDriver().getYButtonPressed();
-        vision = mDriver.getDriver().getYButton();
-        offload_stop = mOperator.getRightTriggerAxis() > 0.3;
-
-        aim = mDriver.getDriver().getBackButton();
-
-
-        drive_pov = mDriver.getPOV();
-
-        //ARM
-        operator_left_x = Util.eliminateDeadband(mOperator.getLeftX());
-        operator_left_y =  Util.eliminateDeadband(mOperator.getLeftY());
-        operator_right_x = Util.eliminateDeadband(mOperator.getRightX());
-        operator_right_y = Util.eliminateDeadband(mOperator.getRightY());
-        operator_trigger = Util.eliminateDeadband(mOperator.getRightTriggerAxis()-mOperator.getLeftTriggerAxis());
-
-        op_a = mOperator.getAButton();
-        op_b = mOperator.getBButton();
-        op_x = mOperator.getXButton();
-        op_y = mOperator.getYButton();
-        op_lb = mOperator.getLeftBumper();
-        op_rb = mOperator.getRightBumper();
-        op_pov = mOperator.getPOV();
-        
+        //intaker
+        home = mDriver.getLeftBumperPressed() || mOperator.getLeftBumperPressed();
+        intaking = mDriver.getAButtonPressed() || mOperator.getAButtonPressed();
+        holdBall = mOperator.getRightBumperPressed();
+        outtake = mOperator.getBButtonPressed();
 
         //shoot
-        BoeingShoot = mDriver.getDriver().getBButton();
-        launchpadShoot = mDriver.getDriver().getYButtonPressed() ? !launchpadShoot : launchpadShoot;
-        autoAimAndShoot = mDriver.getVisionAimPressed() ? !autoAimAndShoot : autoAimAndShoot;
+        fixedShoot = mOperator.getXButton();
+        autoAimAndShoot = mOperator.getYButton();
         GTranslation2d turret_setpoint = new GTranslation2d(-mOperator.getRightY(), -mOperator.getRightX())
                 .rotateBy(SwerveDrive.getInstance().getHeading().inverse());
         if (turret_setpoint.getNorm() > 0.8) {
@@ -114,10 +68,6 @@ public class ControlInput {
             manualTurret = Double.NaN;
         }
 
-        if (mDriver.getPOV() == 0 && lastDrivePOV != 0) {
-            rapidReactMode = !rapidReactMode;
-        }
-        lastDrivePOV = mDriver.getPOV();
     }
 
     public synchronized GTranslation2d getDriveVector() {
@@ -136,129 +86,36 @@ public class ControlInput {
         return pigeonReset;
     }
 
-    public boolean getAim(){
-        return aim;
-    }
-
-    public boolean getSlowMode(){
+    public boolean getSlowMode() {
         return slowMode;
     }
 
-    public double getDriverPOV(){
-        return drive_pov;
+    
+    //shooter
+    public boolean getVisionShoot() {
+        return autoAimAndShoot;
     }
 
-    public double getHangarHighPerc(){
-        return hangar_high_perc;
-    }
-
-    public double getHangarLowPerc(){
-        return hangar_low_perc;
-    }
-
-    public boolean getHangarHighStab(){
-        return hangar_high_stab;
-    }
-
-    public boolean getHangarLowStab(){
-        return hangar_low_stab;
-    }
-
-    public boolean getHangarLowStab2() {
-        return hangar_low_stab2;
+    public boolean getFixedShooter() {
+        return fixedShoot;
     }
     
-    public boolean getHangarReady() {
-        return hangar_is_ready;
-    }
-
-    public boolean getHangMid() {
-        return hang_mid;
-    }
-
-    public boolean getHangHigh() {
-        return hang_high;
-    }
-
-    public boolean getHangTraverse() {
-        return hang_traverse;
-    }
-
-    public boolean getHangReset() {
-        return hangar_reset;
-    }
-    
-    public boolean getManualClimb() {
-        return hangar_set_manual;
-    }
-
-    public void resetManualClimb() {
-        hangar_set_manual = false;
-    }
-
-    public boolean getShoot() {
-        return shoot;
-    }
-    
-    public boolean getLoad(){
-        return load;
-    }
-
-    public boolean getVisionShoot(){
-        return vision;
-    }
-
-    public boolean getOffloadStop(){
-        return offload_stop;
-    }
+    //intaker
     
     public boolean getIntaking() {
         return intaking;
     }
 
-    public boolean getHome(){
+    public boolean getHome() {
         return home;
     }
 
-    public double getOpPOV(){
-        return op_pov;
-    }
-
-    public boolean getOpA(){
-        return op_a;
-    }
-    public boolean getOpB(){
-        return op_b;
-    }
-    public boolean getOpX(){
-        return op_x;
-    }
-    public boolean getOpY(){
-        return op_y;
-    }
-
-    public boolean getOpLB(){
-        return op_lb;
-    }
-
-    public boolean getOpRB(){
-        return op_rb;
-    }
-    public boolean getOpStart(){
-        return op_start;
+    public boolean getHoldingBall() {
+        return holdBall;
     }
     
-    public boolean getCompressorDigital() {
-        return compressor_digital;
-    }
-
-
-    public double[] getArmPerc() {
-        return new double[]{operator_left_x, operator_left_y, operator_right_y, operator_right_x, operator_trigger,0};
-    }
-
-    public double getOpTrigger(){
-        return arm_perc;
+    public boolean getOuttake() {
+        return outtake;
     }
 
 
@@ -268,7 +125,6 @@ public class ControlInput {
             SmartDashboard.putString("DRIVE VECTOR", drive_vector.toString());
             SmartDashboard.putNumber("ROTATE OUTPUT", getDriveRawChangeRate());
             SmartDashboard.putBoolean("LOW POWER", getSlowMode());
-            SmartDashboard.putBoolean("Hangar Set Manual", hangar_set_manual);
         }
 
     }
@@ -280,10 +136,6 @@ public class ControlInput {
 
     public XboxController getOperator() {
         return mOperator;
-    }
-
-    public boolean getRapidReactMode() {
-        return rapidReactMode;
     }
 
     public boolean getReinitialize() {

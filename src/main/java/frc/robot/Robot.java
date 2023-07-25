@@ -212,7 +212,7 @@ public class Robot extends TimedRobot {
         mIntaker.setHome();
       }
 
-      if (mControlInput.getShoot() || mTransfer.getTopO() == 2) {
+      if (mControlInput.getFixedShooter() || mTransfer.getTopO() == 2) {
         mSuperStructure.setWantShoot(new ShootingParameters(8000, 7000, 0));
       } else if(mControlInput.getVisionShoot()){
         mSuperStructure.setWantShootVision();
