@@ -19,6 +19,7 @@ import frc.lib6907.subsystem.Subsystem;
 import frc.lib6907.util.SubsystemManager;
 import frc.robot.auto.AutoModeSelector;
 import frc.robot.devices.ControlInput;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Intaker;
 import frc.robot.subsystems.LED;
@@ -44,229 +45,236 @@ import com.pathplanner.lib.server.PathPlannerServer;
  * project.
  */
 public class Robot extends TimedRobot {
-  /**
-   * This function is run when the robot is first started up and should be used
-   * for any
-   * initialization code.
-   */
-  double target_angle = 0;
-  SwerveDriveModule testModule;
+	/**
+	 * This function is run when the robot is first started up and should be used
+	 * for any
+	 * initialization code.
+	 */
+	double target_angle = 0;
+	SwerveDriveModule testModule;
 
-  private final Looper mEnabledLooper = new Looper();
-  private final Looper mDisabledLooper = new Looper();
-  private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
+	private final Looper mEnabledLooper = new Looper();
+	private final Looper mDisabledLooper = new Looper();
+	private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-  private final RobotState mRobotState = RobotState.getInstance();
+	private final RobotState mRobotState = RobotState.getInstance();
 
-  // list of subsystems
-  private final SwerveDrive mSwerveDrive = SwerveDrive.getInstance();
-  private final VisionProcessor mProcessor = VisionProcessor.getInstance();
-  private final Intaker mIntaker = Intaker.getInstance();
-  private final LED mLED = LED.getInstance();
-  private final Hood mHood = Hood.getInstance();
-  private final Shooter mShooter = Shooter.getInstance();
-  private final SuperStructure mSuperStructure = SuperStructure.getInstance();
-  private final Transfer mTransfer = Transfer.getInstance();
-  private final Turret mTurret = Turret.getInstance();
-  private final Limelight mLL = Limelight.getTheOnlyLL();
+	// list of subsystems
+	private final SwerveDrive mSwerveDrive = SwerveDrive.getInstance();
+	private final VisionProcessor mProcessor = VisionProcessor.getInstance();
+	private final Intaker mIntaker = Intaker.getInstance();
+	private final LED mLED = LED.getInstance();
+	private final Hood mHood = Hood.getInstance();
+	private final Shooter mShooter = Shooter.getInstance();
+	private final SuperStructure mSuperStructure = SuperStructure.getInstance();
+	private final Transfer mTransfer = Transfer.getInstance();
+	private final Turret mTurret = Turret.getInstance();
+	private final Limelight mLL = Limelight.getTheOnlyLL();
+	private final Climb mClimb = Climb.getInstance();
 
-  private final ControlInput mControlInput = ControlInput.getInstance();
+	private final ControlInput mControlInput = ControlInput.getInstance();
 
-  private AutoModeSelector mAutoModeSelector;
-  private AutoMode mAutoMode;
-  private AutoRunner mAutoRunner;
+	private AutoModeSelector mAutoModeSelector;
+	private AutoMode mAutoMode;
+	private AutoRunner mAutoRunner;
 
-  private final SendableChooser<SwerveDriveModule> testModuleChooser = new SendableChooser<>();
+	private final SendableChooser<SwerveDriveModule> testModuleChooser = new SendableChooser<>();
 
-  public double raceStartTimestamp = Double.NaN;
+	public double raceStartTimestamp = Double.NaN;
 
-  @Override
-  public void robotInit() {
+	@Override
+	public void robotInit() {
 
-    // CameraServer.startAutomaticCapture();
-    PathPlannerServer.startServer(5811);
-    mSubsystemManager.setSubsystems(new Subsystem[] {
-        mSwerveDrive,
-        mHood, 
-        mProcessor,
-        mIntaker,
-        mLED,
-        mShooter,
-        mTurret,
-        mTransfer,
-        mSuperStructure,
-        mLL
-    },
-        mSwerveDrive.getModuleArray());
+		// CameraServer.startAutomaticCapture();
+		PathPlannerServer.startServer(5811);
+		mSubsystemManager.setSubsystems(new Subsystem[] {
+				mSwerveDrive,
+				mHood,
+				mProcessor,
+				mIntaker,
+				mLED,
+				mShooter,
+				mTurret,
+				mTransfer,
+				mSuperStructure,
+				mLL,
+				mClimb
+		},
+				mSwerveDrive.getModuleArray());
 
-    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
-    mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+		mSubsystemManager.registerEnabledLoops(mEnabledLooper);
+		mSubsystemManager.registerDisabledLoops(mDisabledLooper);
 
-    mAutoModeSelector = AutoModeSelector.getInstance();
-    mRobotState.reset(Timer.getFPGATimestamp(), new GPose2d());
+		mAutoModeSelector = AutoModeSelector.getInstance();
+		mRobotState.reset(Timer.getFPGATimestamp(), new GPose2d());
 
-    for (SwerveDriveModule m : mSwerveDrive.getModuleArray()) {
-      testModuleChooser.addOption(m.getModuleName(), m);
-    }
+		for (SwerveDriveModule m : mSwerveDrive.getModuleArray()) {
+			testModuleChooser.addOption(m.getModuleName(), m);
+		}
 
+		SmartDashboard.putData("Module", testModuleChooser);
 
+		System.out.println("Robot init finished");
+		mSwerveDrive.zeroSensors();
 
+		for (int i = 0; i < 6; i++) {
+			SmartDashboard.putNumber("Tuning P", 0);
+			SmartDashboard.putNumber("Tuning I", 0);
+			SmartDashboard.putNumber("Tuning D", 0);
+		}
 
-    SmartDashboard.putData("Module", testModuleChooser);
+		SmartDashboard.putBoolean("Intake Debug", Constants.kIntakerDebug);
+		SmartDashboard.putBoolean("Arm Debug", Constants.kArmDebug);
+		SmartDashboard.putBoolean("Swerve Debug", Constants.kSwerveDebug);
+		SmartDashboard.putBoolean("Super Structure Debug", Constants.kSuperStructureDebug);
 
-    System.out.println("Robot init finished");
-    mSwerveDrive.zeroSensors();
+	}
 
-    for (int i = 0; i < 6; i++){
-      SmartDashboard.putNumber("Tuning P", 0);
-      SmartDashboard.putNumber("Tuning I", 0);
-      SmartDashboard.putNumber("Tuning D", 0);
-    }
+	@Override
+	public void robotPeriodic() {
+		mSubsystemManager.outputToSmartDashboard();
+		mControlInput.outputToSmartDashboard();
+		mRobotState.outputTelemetry();
 
-    SmartDashboard.putBoolean("Intake Debug", Constants.kIntakerDebug);
-    SmartDashboard.putBoolean("Arm Debug", Constants.kArmDebug);
-    SmartDashboard.putBoolean("Swerve Debug", Constants.kSwerveDebug);
-    SmartDashboard.putBoolean("Super Structure Debug", Constants.kSuperStructureDebug);
+	}
 
+	public void autonomousInit() {
+		mDisabledLooper.stop();
+		mEnabledLooper.start();
 
-  }
+		mAutoMode = mAutoModeSelector.getSelected();
+		mAutoRunner = new AutoRunner(mAutoMode.getActionList());
 
-  @Override
-  public void robotPeriodic() {
-    mSubsystemManager.outputToSmartDashboard();
-    mControlInput.outputToSmartDashboard();
-    mRobotState.outputTelemetry();
+		// mSwerveDrive.zeroSensors(new GPose2d(mAutoMode.getStartPos()));
+		mSwerveDrive.initializeAll();
 
-    
-  }
+		raceStartTimestamp = Timer.getFPGATimestamp();
+		mAutoRunner.initAuto(raceStartTimestamp);
+		mAutoMode.initAuto();
+	}
 
-  public void autonomousInit() {
-    mDisabledLooper.stop();
-    mEnabledLooper.start();
+	@Override
 
-    mAutoMode = mAutoModeSelector.getSelected();
-    mAutoRunner = new AutoRunner(mAutoMode.getActionList());
+	public void autonomousPeriodic() {
+		mAutoRunner.updatePeriodic(Timer.getFPGATimestamp());
+	}
 
-    // mSwerveDrive.zeroSensors(new GPose2d(mAutoMode.getStartPos()));
-    mSwerveDrive.initializeAll();
+	@Override
+	public void teleopInit() {
+		mDisabledLooper.stop();
+		mEnabledLooper.start();
+		// SwerveDrive.getInstance().initializeAll();
 
-    raceStartTimestamp = Timer.getFPGATimestamp();
-    mAutoRunner.initAuto(raceStartTimestamp);
-    mAutoMode.initAuto();
-  }
+	}
 
-  @Override
+	boolean sucking = false;
 
-  public void autonomousPeriodic() {
-    mAutoRunner.updatePeriodic(Timer.getFPGATimestamp());
-  }
+	@Override
+	public void teleopPeriodic() {
+		try {
+			mControlInput.updateInput();
 
-  @Override
-  public void teleopInit() {
-    mDisabledLooper.stop();
-    mEnabledLooper.start();
-    // SwerveDrive.getInstance().initializeAll();
+			// if(mControlInput.getDriverPOV() == 90){
+			// lastAimNode = AimNode.RIGHT_CONE;
+			// }else if(mControlInput.getDriverPOV() == 0){
+			// lastAimNode = AimNode.MID_CUBE;
+			// }else if(mControlInput.getDriverPOV() == 270){
+			// lastAimNode = AimNode.LEFT_CONE;
+			// }
 
-  }
+			// Swerve
+			// if(mControlInput.getDriverPOV() == 0){
+			// mSwerveDrive.setCharge(true);
+			// }else if(mControlInput.getDriverPOV() == 180){
+			// mSwerveDrive.setCharge(false);
+			// if(mControlInput.getAim()){
+			// mSwerveDrive.setAim(lastAimNode);
+			// }else
+			double targetAngle = mControlInput.getDriveTargetAngle();
 
+			if(mControlInput.getDriverPOV() == 180){
+				targetAngle = 0;
+			}
 
-  boolean sucking = false;
-  @Override
-  public void teleopPeriodic() {
-    try {
-      mControlInput.updateInput();
+			//pigeon fused heading and robot heading has 180 degree difference
+			targetAngle += 180;
 
-      // if(mControlInput.getDriverPOV() == 90){
-      //   lastAimNode = AimNode.RIGHT_CONE;
-      // }else if(mControlInput.getDriverPOV() == 0){
-      //   lastAimNode = AimNode.MID_CUBE;
-      // }else if(mControlInput.getDriverPOV() == 270){
-      //   lastAimNode = AimNode.LEFT_CONE;
-      // }
+			mSwerveDrive.setManual(mControlInput.getDriveVector().scale(0.65), mControlInput.getDriveRawChangeRate(),
+					targetAngle, mControlInput.getVisionShoot() ? true : mControlInput.getSlowMode());
 
-      // Swerve
-      // if(mControlInput.getDriverPOV() == 0){
-      //   mSwerveDrive.setCharge(true);
-      // }else if(mControlInput.getDriverPOV() == 180){
-      //   mSwerveDrive.setCharge(false);
-      // if(mControlInput.getAim()){
-      //   mSwerveDrive.setAim(lastAimNode);
-      // }else 
-      double targetAngle = mControlInput.getDriveTargetAngle()+180;
+			if (mControlInput.getPigeonReset()) { // driver start
+				System.out.println("sensor zeroed");
+				mSwerveDrive.zeroSensors();
+				mSwerveDrive.rotate(0);
+				SwerveDrive.getInstance().initializeAll();
+			}
 
-      mSwerveDrive.setManual(mControlInput.getDriveVector().scale(0.8), mControlInput.getDriveRawChangeRate(),  
-      targetAngle, mControlInput.getVisionShoot()?true:mControlInput.getSlowMode());
-      
+			// Intake
+			if (mControlInput.getIntaking()) { // driver a
+				mIntaker.setIntake();
+			} else if (mControlInput.getHome() || mControlInput.getOperator().getXButtonReleased()) {// driver left
+																										// bumper
+				mIntaker.setHome();
+			}
 
-      if (mControlInput.getPigeonReset()) { // driver start
-        System.out.println("sensor zeroed");
-        mSwerveDrive.zeroSensors();
-        mSwerveDrive.rotate(0);
-        SwerveDrive.getInstance().initializeAll();
-      }
+			if (mControlInput.getFixedShooter() || mTransfer.getTopO() == 2) {
+				mSuperStructure.setWantShoot(new ShootingParameters(8000, 5500, 0));
+			} else if (mControlInput.getVisionShoot()) {
+				mSuperStructure.setWantShootVision();
+			} else {
+				mSuperStructure.stop();
+			}
 
-      //Intake
-      if(mControlInput.getIntaking()){ //driver a
-        mIntaker.setIntake();
-      }else if(mControlInput.getHome() || mControlInput.getOperator().getXButtonReleased()){// driver left bumper
-        mIntaker.setHome();
-      }
+			// Climb
+			if (mControlInput.getClimbUp()) {
+				mClimb.setClimb(69500);
+			} else if (mControlInput.getClimbDown()) {
+				mClimb.setClimb(500);
+			}
 
-      if (mControlInput.getFixedShooter() || mTransfer.getTopO() == 2) {
-        mSuperStructure.setWantShoot(new ShootingParameters(8000, 7000, 0));
-      } else if(mControlInput.getVisionShoot()){
-        mSuperStructure.setWantShootVision();
-      }else{
-        mSuperStructure.stop();
-      }
-      
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
-  }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
-  // public synchronized double setModuleAngle(double goal) {
-  // double newAngle =
-  // Util.placeInAppropriate0To360Scope(falcon.getSelectedSensorPosition()/2048.0*60,
-  // goal);
-  // return newAngle;
-  // }
+	// public synchronized double setModuleAngle(double goal) {
+	// double newAngle =
+	// Util.placeInAppropriate0To360Scope(falcon.getSelectedSensorPosition()/2048.0*60,
+	// goal);
+	// return newAngle;
+	// }
 
-  public void disabledInit() {
-    System.out.println("Disabled Loop running");
-    mDisabledLooper.start();
-    mEnabledLooper.stop();
-  }
+	public void disabledInit() {
+		System.out.println("Disabled Loop running");
+		mDisabledLooper.start();
+		mEnabledLooper.stop();
+	}
 
-  public void disabledPeriodic() {
+	public void disabledPeriodic() {
 
-  }
+	}
 
-  public void testInit() {
-    mDisabledLooper.stop();
-    mEnabledLooper.start();
+	public void testInit() {
+		mDisabledLooper.stop();
+		mEnabledLooper.start();
 
-    testModule = testModuleChooser.getSelected();
+		testModule = testModuleChooser.getSelected();
 
-    
+		// GPose2d tempTestInitPose = new GPose2d(-3.0, 0, GRotation2d.fromDegrees(0));
 
+		// mRobotState.reset(Timer.getFPGATimestamp(), tempTestInitPose);
+		// mSwerveDrive.resetHeading(tempTestInitPose.getRotation().getDegrees());
+		// mSwerveDrive.resetOdometry(tempTestInitPose);
+		// testFalcon3.setSelectedSensorPosition(0);
+	}
 
-    // GPose2d tempTestInitPose = new GPose2d(-3.0, 0, GRotation2d.fromDegrees(0));
+	public void testPeriodic() {
 
-    // mRobotState.reset(Timer.getFPGATimestamp(), tempTestInitPose);
-    // mSwerveDrive.resetHeading(tempTestInitPose.getRotation().getDegrees());
-    // mSwerveDrive.resetOdometry(tempTestInitPose);
-    // testFalcon3.setSelectedSensorPosition(0);
-  }
-
-
-  public void testPeriodic() {
-
-    // if(!mControlInput.getOperator().getAButton())
-    //   srx.set(ControlMode.PercentOutput, 0.7);
-    // else
-    //   srx.set(ControlMode.PercentOutput, -0.7);
-    XboxController op = mControlInput.getOperator();
-    mControlInput.updateInput();
-  }
+		// if(!mControlInput.getOperator().getAButton())
+		// srx.set(ControlMode.PercentOutput, 0.7);
+		// else
+		// srx.set(ControlMode.PercentOutput, -0.7);
+		XboxController op = mControlInput.getOperator();
+		mControlInput.updateInput();
+	}
 }

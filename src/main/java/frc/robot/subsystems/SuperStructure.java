@@ -191,17 +191,11 @@ public class SuperStructure extends Subsystem {
             double angle = turretToVT.direction().rotateBy(RobotState.getInstance().getVehicleToTurret(Timer.getFPGATimestamp()).getRotation()).getDegrees();
             SmartDashboard.putNumber("SS SHOOT DIST", dist);
             SmartDashboard.putNumber("SS SHOOT ANGLE", angle);
-            if (!shoot_low_hub) {
-                mShootingParameters = new ShootingParameters(
-                        Constants.kHighHoodMap.getInterpolated(new InterpolatingDouble(dist)).value,
-                        Constants.kHighShooterMap.getInterpolated(new InterpolatingDouble(dist)).value,
-                        angle + SwerveDrive.getInstance().getHeadingDegree());
-            } else {
-                mShootingParameters = new ShootingParameters(
-                        Constants.kLowHoodMap.getInterpolated(new InterpolatingDouble(dist)).value,
-                        Constants.kLowShooterMap.getInterpolated(new InterpolatingDouble(dist)).value,
-                        angle + SwerveDrive.getInstance().getHeadingDegree());
-            }
+            mShootingParameters = new ShootingParameters(
+                    Constants.kHighHoodMap.getInterpolated(new InterpolatingDouble(dist)).value,
+                    Constants.kHighShooterMap.getInterpolated(new InterpolatingDouble(dist)).value,
+                    angle + SwerveDrive.getInstance().getHeadingDegree());
+           
             // } else if (modeDynamic){
 
                 

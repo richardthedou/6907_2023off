@@ -34,6 +34,10 @@ public class ControlInput {
     private boolean holdBall;
     private boolean outtake;
 
+    //climb 
+    private boolean climb_up;
+    private boolean climb_down;
+
     public static ControlInput getInstance() {
         if (sInstance == null)
             sInstance = new ControlInput();
@@ -58,7 +62,7 @@ public class ControlInput {
         outtake = mOperator.getBButtonPressed();
 
         //shoot
-        fixedShoot = mOperator.getXButton();
+        fixedShoot = mOperator.getXButton() || mDriver.getDriver().getXButton();
         autoAimAndShoot = mOperator.getYButton();
         GTranslation2d turret_setpoint = new GTranslation2d(-mOperator.getRightY(), -mOperator.getRightX())
                 .rotateBy(SwerveDrive.getInstance().getHeading().inverse());
@@ -67,6 +71,10 @@ public class ControlInput {
         } else {
             manualTurret = Double.NaN;
         }
+        
+        //climb
+        climb_up = mOperator.getPOV() == 0;
+        climb_down = mOperator.getPOV() == 180;
 
     }
 
@@ -101,7 +109,6 @@ public class ControlInput {
     }
     
     //intaker
-    
     public boolean getIntaking() {
         return intaking;
     }
@@ -127,6 +134,15 @@ public class ControlInput {
             SmartDashboard.putBoolean("LOW POWER", getSlowMode());
         }
 
+    }
+
+    //climb
+    public boolean getClimbUp() {
+        return climb_up;
+    }
+
+    public boolean getClimbDown() {
+        return climb_down;
     }
 
     //FOR TESTING USE ONLY

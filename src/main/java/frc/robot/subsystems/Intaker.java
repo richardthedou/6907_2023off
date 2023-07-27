@@ -96,7 +96,7 @@ public class Intaker extends Subsystem {
         mIntakeExtend.configNeutralDeadband(0.001);
 
         mIntakeExtend.configForwardSoftLimitEnable(true, 10);
-        mIntakeExtend.configForwardSoftLimitThreshold(5000, 10);
+        mIntakeExtend.configForwardSoftLimitThreshold(6000, 10);
 
         mIntakeRoller.selectProfileSlot(0, 0);
         mIntakeRoller.config_kP(0, 0.1, 10);
@@ -212,7 +212,9 @@ public class Intaker extends Subsystem {
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK;
                 mPeriodicIO.roller_mode = ControlMode.PercentOutput;
-                mPeriodicIO.roller_demand = mPeriodicIO.extend_pos > 2000? 0.20:0;
+                // mPeriodicIO.roller_demand = mPeriodicIO.extend_pos > 2000? 0.20:0;
+                mPeriodicIO.roller_demand = 0.27;
+
                 break;
             case HOLDBALL:
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
@@ -235,7 +237,6 @@ public class Intaker extends Subsystem {
         if (!extend_initialized || !hood_initialized) {
             mIntakeExtend.set(ControlMode.PercentOutput, extend_initialized ? 0 : -0.11);
             mIntakeRoller.set(ControlMode.PercentOutput, 0);
-
         } else {
             mIntakeExtend.set(mPeriodicIO.extend_mode, mPeriodicIO.extend_demand);
             mIntakeRoller.set(mPeriodicIO.roller_mode, mPeriodicIO.roller_demand);

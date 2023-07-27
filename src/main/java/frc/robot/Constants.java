@@ -150,14 +150,6 @@ public class Constants {
 
     }
     
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLowShooterMap = new InterpolatingTreeMap<>();
-    static {
-        kLowShooterMap.put(new InterpolatingDouble(2.0), new InterpolatingDouble(4000.0));
-        kLowShooterMap.put(new InterpolatingDouble(2.5), new InterpolatingDouble(4250.0));
-        kLowShooterMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(4750.0));
-    }
-
-    
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHighHoodMap = new InterpolatingTreeMap<>();
     static {
@@ -174,13 +166,6 @@ public class Constants {
 
     }
 
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLowHoodMap = new InterpolatingTreeMap<>();
-    static {
-        //TODO: Test
-        kLowHoodMap.put(new InterpolatingDouble(2.0), new InterpolatingDouble(24000.0));
-        kLowHoodMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(24000.0));
-    }
-
 
     //Hood 
     public static final int Hood_ID = 25;
@@ -188,6 +173,7 @@ public class Constants {
     //Super Structure
     public static final boolean kSuperStructureDebug = true;
 
-
+    //Climb
+    public static final int CLIMB_ID = 30;
 
 }
