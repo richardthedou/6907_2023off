@@ -44,7 +44,7 @@ public class RobotState {
 
     private GPose2d field_to_vt = new GPose2d();
     private final GPose2d theoretical_field_to_vt = new GPose2d();
-    private GTranslation2d vehicle_to_turret_translation = new GTranslation2d(0.16, 0);
+    private GTranslation2d vehicle_to_turret_translation = new GTranslation2d(0.15, 0);
     private Pose2d cameraToRobot = new Pose2d(0,0, new Rotation2d());
     private GoalTracker goal_tracker = new GoalTracker();
 

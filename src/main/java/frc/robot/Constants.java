@@ -65,7 +65,7 @@ public class Constants {
         Back_Right.drive_ID = 4;
         Back_Right.rotate_ID = 5;
         Back_Right.rotate_Offset = 1536;
-        Back_Right.lightGateID = 4;
+        Back_Right.lightGateID = 6;
         Back_Right.modulePosition = new GTranslation2d(-SWERVE_SIDE_LENGTH / 2, -SWERVE_SIDE_LENGTH / 2);
         Back_Right.invertRotate = false;
         Back_Right.invertDrive = false;
@@ -139,29 +139,31 @@ public class Constants {
     //Shooter dist -> veltick
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHighShooterMap = new InterpolatingTreeMap<>();
     static {
-        kHighShooterMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(8500.0));
-        kHighShooterMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(9200.0));
-        kHighShooterMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(14000.0));
-        // kHighShooterMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(6750.0));
-        // kHighShooterMap.put(new InterpolatingDouble(2.5), new InterpolatingDouble(7200.0));
-        // kHighShooterMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(7625.0));
-        // kHighShooterMap.put(new InterpolatingDouble(3.5), new InterpolatingDouble(7750.0));
-        // kHighShooterMap.put(new InterpolatingDouble(4.5), new InterpolatingDouble(8250.0));
+        kHighShooterMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(8300.0)); //8500
+        kHighShooterMap.put(new InterpolatingDouble(2.3), new InterpolatingDouble(8700.0));
+        kHighShooterMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(8800.0));
+        kHighShooterMap.put(new InterpolatingDouble(3.5), new InterpolatingDouble(8800.0));
+        kHighShooterMap.put(new InterpolatingDouble(3.8), new InterpolatingDouble(8800.0));
+        kHighShooterMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(9600.0));
+        kHighShooterMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(12000.0));
+        
+
+      
 
     }
     
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHighHoodMap = new InterpolatingTreeMap<>();
     static {
-        //TODO: Test
-        // kHighHoodMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(1000.0));
-        // kHighHoodMap.put(new InterpolatingDouble(2.5), new InterpolatingDouble(5000.0));
-        // kHighHoodMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(13000.0));
-        // kHighHoodMap.put(new InterpolatingDouble(3.5), new InterpolatingDouble(16000.0));
-        // kHighHoodMap.put(new InterpolatingDouble(4.5), new InterpolatingDouble(23000.0));
-        kHighHoodMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(3000.0));
-        kHighHoodMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(12000.0));
-        kHighHoodMap.put(new InterpolatingDouble(4.5), new InterpolatingDouble(23000.0));
+        
+        kHighHoodMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(8000.0)); //6000
+        kHighHoodMap.put(new InterpolatingDouble(2.4), new InterpolatingDouble(10500.0)); //10500
+        kHighHoodMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(13000.0)); //14000
+        kHighHoodMap.put(new InterpolatingDouble(3.5), new InterpolatingDouble(15000.0)); //15000
+        kHighHoodMap.put(new InterpolatingDouble(4.5), new InterpolatingDouble(25000.0)); //30000
+        kHighHoodMap.put(new InterpolatingDouble(5.5), new InterpolatingDouble(30000.0)); //30000
+
+        
 
 
     }

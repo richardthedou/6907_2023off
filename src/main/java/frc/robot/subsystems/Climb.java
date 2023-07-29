@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
@@ -41,6 +42,7 @@ public class Climb extends Subsystem {
 
         //outputs
         public double climb_targetpos;
+        public double turret_desiredpos;
     }
 
     public TalonFX mFX;
@@ -155,7 +157,9 @@ public class Climb extends Subsystem {
                         case SOFT_CALIB:
                             updateSoftCalib();
                         case HOME:
+                            break;
                         case CLIMBING:
+                            updateClimbing();
                             break;
                         default:
                             state = ClimbState.HOME;
@@ -188,8 +192,25 @@ public class Climb extends Subsystem {
     }
 
     public synchronized void setClimb(double target) {
-        if (calibrated && state != ClimbState.CLIMBING)    state = ClimbState.CLIMBING;
-        mPIO.climb_targetpos = target;
+        if (calibrated && state != ClimbState.CLIMBING){
+            state = ClimbState.CLIMBING;
+            Turret.getInstance().setAngle(0, 0);
+            mPIO.turret_desiredpos = target;
+            if (target < 10000) {
+                mFX.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.1));
+            } else {
+                mFX.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1));
+
+            }
+        }
+    }
+    
+    public void updateClimbing() {
+        if(Math.abs(Turret.getInstance().getTurretDegree())<5){
+            mPIO.climb_targetpos = mPIO.turret_desiredpos;
+        } else {
+            mPIO.climb_targetpos = mPIO.climb_postick;
+        }
     }
 
     public double getClimbPos() {

@@ -190,16 +190,18 @@ public class Robot extends TimedRobot {
 			// if(mControlInput.getAim()){
 			// mSwerveDrive.setAim(lastAimNode);
 			// }else
-			double targetAngle = mControlInput.getDriveTargetAngle();
 
-			if(mControlInput.getDriverPOV() == 180){
+			//pigeon fused heading and robot heading has 180 degree difference
+			double targetAngle = mControlInput.getDriveTargetAngle()+180;
+
+			if(mControlInput.getDrivePOV() == 180){
+				targetAngle = 180;
+			} else if (mControlInput.getDrivePOV() == 0) {
 				targetAngle = 0;
 			}
 
-			//pigeon fused heading and robot heading has 180 degree difference
-			targetAngle += 180;
 
-			mSwerveDrive.setManual(mControlInput.getDriveVector().scale(0.65), mControlInput.getDriveRawChangeRate(),
+			mSwerveDrive.setManual(mControlInput.getDriveVector().scale(0.75), mControlInput.getDriveRawChangeRate() * 0.7,
 					targetAngle, mControlInput.getVisionShoot() ? true : mControlInput.getSlowMode());
 
 			if (mControlInput.getPigeonReset()) { // driver start
@@ -212,12 +214,17 @@ public class Robot extends TimedRobot {
 			// Intake
 			if (mControlInput.getIntaking()) { // driver a
 				mIntaker.setIntake();
-			} else if (mControlInput.getHome() || mControlInput.getOperator().getXButtonReleased()) {// driver left
-																										// bumper
+			} else if(mControlInput.getIntakeNear()){
+				mIntaker.setIntakeNear();
+			}else if (mControlInput.getHome() || mControlInput.getOperator().getXButtonReleased()) {// driver left bumper
 				mIntaker.setHome();
+			} else if (mControlInput.getOuttake()) {
+				mIntaker.setOuttake();
+			} else if (mControlInput.getHoldingBall()) {
+				mIntaker.setHoldBall();
 			}
 
-			if (mControlInput.getFixedShooter() || mTransfer.getTopO() == 2) {
+			if (mControlInput.getFixedShooter()) {
 				mSuperStructure.setWantShoot(new ShootingParameters(8000, 5500, 0));
 			} else if (mControlInput.getVisionShoot()) {
 				mSuperStructure.setWantShootVision();
@@ -237,12 +244,6 @@ public class Robot extends TimedRobot {
 		}
 	}
 
-	// public synchronized double setModuleAngle(double goal) {
-	// double newAngle =
-	// Util.placeInAppropriate0To360Scope(falcon.getSelectedSensorPosition()/2048.0*60,
-	// goal);
-	// return newAngle;
-	// }
 
 	public void disabledInit() {
 		System.out.println("Disabled Loop running");

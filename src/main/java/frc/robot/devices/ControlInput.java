@@ -17,7 +17,7 @@ public class ControlInput {
     private boolean pigeonReset;
     private boolean slowMode;
     private boolean reinitialize;
-
+    private double drive_pov = Double.NaN;
 
 
     //Hangar
@@ -33,6 +33,7 @@ public class ControlInput {
     private boolean intaking;
     private boolean holdBall;
     private boolean outtake;
+    private boolean intakeNear;
 
     //climb 
     private boolean climb_up;
@@ -49,17 +50,19 @@ public class ControlInput {
     }
 
     public synchronized void updateInput() {
-        drive_vector = mDriver.getDriveVector();
-        drive_rawRate = mDriver.getRawChangeRate();
-        pigeonReset = mDriver.getPigeonReset();
-        drive_targetAngle = mDriver.getDriveTargetAngle();
-        slowMode = mDriver.getSlowMode();
+        drive_vector = mDriver.getDriveVector(); //left joystick
+        drive_rawRate = mDriver.getRawChangeRate(); //trigger (left is CCW, right is CW)
+        pigeonReset = mDriver.getPigeonReset(); //start button
+        drive_targetAngle = mDriver.getDriveTargetAngle(); //Right joystick
+        slowMode = mDriver.getSlowMode(); //Right Bumper
+        drive_pov = mDriver.getPOV();  //pov
 
         //intaker
-        home = mDriver.getLeftBumperPressed() || mOperator.getLeftBumperPressed();
+        home = mDriver.getLeftBumperPressed() || mOperator.getLeftBumperPressed(); 
         intaking = mDriver.getAButtonPressed() || mOperator.getAButtonPressed();
-        holdBall = mOperator.getRightBumperPressed();
+        holdBall = mOperator.getStartButtonPressed();
         outtake = mOperator.getBButtonPressed();
+        intakeNear = mOperator.getRightBumperPressed();
 
         //shoot
         fixedShoot = mOperator.getXButton() || mDriver.getDriver().getXButton();
@@ -98,6 +101,9 @@ public class ControlInput {
         return slowMode;
     }
 
+    public double getDrivePOV() {
+        return drive_pov;
+    }
     
     //shooter
     public boolean getVisionShoot() {
@@ -123,6 +129,10 @@ public class ControlInput {
     
     public boolean getOuttake() {
         return outtake;
+    }
+    
+    public boolean getIntakeNear() {
+        return intakeNear;
     }
 
 

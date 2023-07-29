@@ -5,7 +5,7 @@ import frc.lib6907.auto.Action;
 import frc.robot.subsystems.Intaker;
 import frc.robot.subsystems.Intaker.IntakerState;
 
-public class IntakeAction extends Action {
+public class OuttakeAction extends Action {
 
     /**
      * 
@@ -13,14 +13,14 @@ public class IntakeAction extends Action {
      * @param start targetState set time
      * @param end useless
      */
-    public IntakeAction(double start, double end) {
+    public OuttakeAction(double start, double end) {
         super(start, end);
     }
 
     @Override
     public void start() {
         
-        Intaker.getInstance().setIntake();
+        Intaker.getInstance().setOuttake();
     
     }
 

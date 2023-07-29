@@ -34,7 +34,7 @@ public class Shooter extends Subsystem {
         STOP,
         IDLE, //DEFAULT
         SHOOT_SPINNING,
-        SHOOT_VELOCITY
+        SHOOT_VELOCITY,
     }
 
     private TalonFX mShooterLeft, mShooterRight;

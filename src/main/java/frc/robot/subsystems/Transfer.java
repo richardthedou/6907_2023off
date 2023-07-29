@@ -19,6 +19,7 @@ import frc.robot.subsystems.SuperStructure.SuperStructureState;
 import frc.robot.util.Util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
@@ -48,6 +49,8 @@ public class Transfer extends Subsystem {
 
     private TransferState mTransferState;
     private PeriodicIO mPeriodicIO;
+
+    private double intake_last_timestamp;
 
     Color red = new Color(0.5, 0.16, 0.34);
     Color blue = new Color(0.15,0.35, 0.5);
@@ -140,7 +143,7 @@ public class Transfer extends Subsystem {
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Transfer.this) {
-                    mTransferState = determineState();
+                    mTransferState = determineState(timestamp);
 
                     switch (mTransferState) {
                         case DELIVERING:
@@ -157,6 +160,12 @@ public class Transfer extends Subsystem {
                             break;
                         case STOP:
                             break;
+                        case HOLDINGBALL:
+                            handleHolding(timestamp);
+                            break;
+                        case OUTTAKING:
+                            handleOuttake(timestamp);
+                            break;
                         default:
                             break;
 
@@ -172,7 +181,7 @@ public class Transfer extends Subsystem {
         });
     }
 
-    private TransferState determineState() {
+    private TransferState determineState(double timestamp) {
         IntakerState mIntakerState = Intaker.getInstance().getState();
         SuperStructureState mSSState = SuperStructure.getInstance().getState();
         if (mIntakerState == IntakerState.HOLDBALL) {
@@ -182,6 +191,12 @@ public class Transfer extends Subsystem {
         } else if (mSSState == SuperStructureState.SHOOTING) {
             return TransferState.DELIVERING;
         } else if (mIntakerState == IntakerState.INTAKE) {
+            intake_last_timestamp = timestamp;
+            return TransferState.INTAKING;
+        } else if (mIntakerState == IntakerState.INTAKE_FOR_HOLD) {
+            intake_last_timestamp = timestamp;
+            return TransferState.HOLDINGBALL;
+        }else if(Timer.getFPGATimestamp() - intake_last_timestamp < 1.5){
             return TransferState.INTAKING;
         } else if (mSSState == SuperStructureState.AIMING) {
             return TransferState.PREPARE_TO_SHOOT;
@@ -191,8 +206,8 @@ public class Transfer extends Subsystem {
     }
 
     private void handleIndexing(double timestamp) {
-        mPeriodicIO.centralizer_demand = 0.5;
-        mPeriodicIO.feeder_demand = -0.1;
+        mPeriodicIO.centralizer_demand = 0.0;
+        mPeriodicIO.feeder_demand = 0.0;
 
         if (mPeriodicIO.top_detected) {
             mPeriodicIO.transfer_demand = 0.0;
@@ -214,6 +229,7 @@ public class Transfer extends Subsystem {
         } else {
             mPeriodicIO.transfer_demand = 0.0;
         }
+        intake_last_timestamp = timestamp;
     }
 
     private void handlePreparing(double timestamp) {
@@ -233,8 +249,20 @@ public class Transfer extends Subsystem {
     private void handleDelivering(double timestamp) {
         mPeriodicIO.centralizer_demand = 0.3;
         mPeriodicIO.transfer_demand = 0.8;
-        mPeriodicIO.feeder_demand = 0.1;
+        mPeriodicIO.feeder_demand = -0.1;
 
+    }
+
+    private void handleHolding(double timestamp) {
+        mPeriodicIO.centralizer_demand = 0.0;
+        mPeriodicIO.transfer_demand = 0.0;
+        mPeriodicIO.feeder_demand = 0.0;
+    }
+
+    private void handleOuttake(double timestamp) {
+        mPeriodicIO.centralizer_demand = -0.3;
+        mPeriodicIO.transfer_demand = -0.5;
+        mPeriodicIO.feeder_demand = 0.3;
     }
 
     @Override

@@ -16,7 +16,7 @@ import frc.robot.Constants;
 import frc.robot.util.Util;
 
 public class Intaker extends Subsystem {
-    public final double EXTEND_TICK = 4800;
+    public final double EXTEND_TICK = 4500;
     public final double HOME_TICK = 1000;
     public final double PLATE_DOWN_TICK = 0;
     public final double PLATE_FEED_TICK = 3000;
@@ -33,7 +33,7 @@ public class Intaker extends Subsystem {
     public boolean offload_spin = false;
 
     public enum IntakerState {
-        HOME, INTAKE, FEED, HOLDBALL, OUTTAKE
+        HOME, INTAKE, FEED, HOLDBALL, OUTTAKE, INTAKE_FOR_HOLD
     }
 
     private boolean extend_initialized = true;
@@ -211,16 +211,23 @@ public class Intaker extends Subsystem {
                 mIntakeExtend.configMotionCruiseVelocity(3000);
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK;
-                mPeriodicIO.roller_mode = ControlMode.PercentOutput;
-                // mPeriodicIO.roller_demand = mPeriodicIO.extend_pos > 2000? 0.20:0;
-                mPeriodicIO.roller_demand = 0.27;
+                mPeriodicIO.roller_mode = ControlMode.Velocity;
+                mPeriodicIO.roller_demand = 5000;
 
+                break;
+            case INTAKE_FOR_HOLD:
+                mIntakeExtend.configMotionCruiseVelocity(3000);
+                mPeriodicIO.extend_mode = ControlMode.MotionMagic;
+                mPeriodicIO.extend_demand = EXTEND_TICK;
+                mPeriodicIO.roller_mode = ControlMode.PercentOutput;
+                mPeriodicIO.roller_demand = 0.27;
                 break;
             case HOLDBALL:
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK;
                 mPeriodicIO.roller_mode = ControlMode.PercentOutput;
                 mPeriodicIO.roller_demand = 0;
+                break;
             case OUTTAKE:
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK + 1000;
@@ -250,6 +257,12 @@ public class Intaker extends Subsystem {
             mIntakerState = IntakerState.INTAKE;
         }
 
+    }
+
+    public synchronized void setIntakeNear() {
+        if (mIntakerState != IntakerState.INTAKE_FOR_HOLD) {
+            mIntakerState = IntakerState.INTAKE_FOR_HOLD;
+        }
     }
 
     public synchronized void setHoldBall() {

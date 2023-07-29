@@ -237,18 +237,15 @@ public class SuperStructure extends Subsystem {
                 // }
             // }
         }
-        // TODO : Color Sensor
-        if (Transfer.getInstance().getTopO() == 2) {
-            mHood.setHood(30000);
-            mShooter.setShootVel(5000);
-            mTurret.setFieldAngle(180,0);
-        } else {
-            mHood.setHood(mShootingParameters.getHoodTargetTick());
-            mShooter.setShootVel(mShootingParameters.getShooterTargetVel());
-            // mShooter.stop();
-
-            mTurret.setFieldAngle(mShootingParameters.getFieldRelAngle(),0);
-        }
+        // if (Transfer.getInstance().getTopO() == 2) {
+        //     mHood.setHood(30000);
+        //     mShooter.setShootVel(5000);
+        //     mTurret.setFieldAngle(180,0);
+        // } else {
+        mHood.setHood(mShootingParameters.getHoodTargetTick());
+        mShooter.setShootVel(mShootingParameters.getShooterTargetVel());
+        mTurret.setFieldAngle(mShootingParameters.getFieldRelAngle(),0);
+        // }
     }
 
     // private double get_target_error(GTranslation2d turretToVT, GTranslation2d vehicleVel, double guessTime) {

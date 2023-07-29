@@ -3,9 +3,10 @@ package frc.robot.auto.actions;
 
 import frc.lib6907.auto.Action;
 import frc.robot.subsystems.Intaker;
+import frc.robot.subsystems.SuperStructure;
 import frc.robot.subsystems.Intaker.IntakerState;
 
-public class IntakeAction extends Action {
+public class ShootAction extends Action {
 
     /**
      * 
@@ -13,14 +14,14 @@ public class IntakeAction extends Action {
      * @param start targetState set time
      * @param end useless
      */
-    public IntakeAction(double start, double end) {
+    public ShootAction(double start, double end) {
         super(start, end);
     }
 
     @Override
     public void start() {
         
-        Intaker.getInstance().setIntake();
+        SuperStructure.getInstance().setWantShootVision();
     
     }
 
@@ -31,7 +32,7 @@ public class IntakeAction extends Action {
 
     @Override
     public void end() {
-        Intaker.getInstance().setHome();
+        SuperStructure.getInstance().stop();
     }
 
 }

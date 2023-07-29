@@ -56,7 +56,7 @@ public class Limelight extends Subsystem {
     private boolean mOutputChanged = true;
     private static final double[] mZeroArray = new double[] { 0.0 };
 
-    private static final double FOVX = 59.6, FOVY = 49.7, PITCH = 38;
+    private static final double FOVX = 59.6, FOVY = 49.7, PITCH = 30;
 
 
     private Translation2d getFieldProj(Translation2d pt, double heigh_diff){
