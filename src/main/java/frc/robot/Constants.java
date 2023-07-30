@@ -115,14 +115,14 @@ public class Constants {
     public static final int Intaker_Centralizer_ID = 12;
 
     public static final StatorCurrentLimitConfiguration Intaker_Centralizer_Limit = new StatorCurrentLimitConfiguration(true, 40, 40, 0.1);
-    public static final SupplyCurrentLimitConfiguration Intaker_Current_Limit = new SupplyCurrentLimitConfiguration(true, 10, 40, 0.2);
+    public static final SupplyCurrentLimitConfiguration Intaker_Current_Limit = new SupplyCurrentLimitConfiguration(true, 30, 40, 0.2);
     public static final StatorCurrentLimitConfiguration Intaker_Extend_Limit = new StatorCurrentLimitConfiguration(false, 10, 20, 0.1);
 
     //Transfer
     public static final int Transfer_ID = 33;
     public static final SupplyCurrentLimitConfiguration Transfer_Current_Limit = new SupplyCurrentLimitConfiguration(true, 10, 10, 0.1);
-    public static final int Transfer_Top_Omron_ID = 5;
     public static final int Transfer_Bottom_Omron_ID = 8;
+    public static final int Transfer_Top_Omron_ID = 9;
 
 
     //Turret
@@ -139,11 +139,12 @@ public class Constants {
     //Shooter dist -> veltick
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHighShooterMap = new InterpolatingTreeMap<>();
     static {
+        kHighShooterMap.put(new InterpolatingDouble(1.5), new InterpolatingDouble(8000.0)); //8500
         kHighShooterMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(8300.0)); //8500
         kHighShooterMap.put(new InterpolatingDouble(2.3), new InterpolatingDouble(8700.0));
         kHighShooterMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(8800.0));
         kHighShooterMap.put(new InterpolatingDouble(3.5), new InterpolatingDouble(8800.0));
-        kHighShooterMap.put(new InterpolatingDouble(3.8), new InterpolatingDouble(8800.0));
+        kHighShooterMap.put(new InterpolatingDouble(3.8), new InterpolatingDouble(8900.0));
         kHighShooterMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(9600.0));
         kHighShooterMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(12000.0));
         
@@ -159,6 +160,7 @@ public class Constants {
         kHighHoodMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(8000.0)); //6000
         kHighHoodMap.put(new InterpolatingDouble(2.4), new InterpolatingDouble(10500.0)); //10500
         kHighHoodMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(13000.0)); //14000
+        kHighHoodMap.put(new InterpolatingDouble(3.15), new InterpolatingDouble(13500.0)); //14000
         kHighHoodMap.put(new InterpolatingDouble(3.5), new InterpolatingDouble(15000.0)); //15000
         kHighHoodMap.put(new InterpolatingDouble(4.5), new InterpolatingDouble(25000.0)); //30000
         kHighHoodMap.put(new InterpolatingDouble(5.5), new InterpolatingDouble(30000.0)); //30000

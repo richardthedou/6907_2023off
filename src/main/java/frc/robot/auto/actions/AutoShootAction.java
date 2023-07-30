@@ -6,7 +6,7 @@ import frc.robot.subsystems.Intaker;
 import frc.robot.subsystems.SuperStructure;
 import frc.robot.subsystems.Intaker.IntakerState;
 
-public class ShootAction extends Action {
+public class AutoShootAction extends Action {
 
     /**
      * 
@@ -14,7 +14,7 @@ public class ShootAction extends Action {
      * @param start targetState set time
      * @param end useless
      */
-    public ShootAction(double start, double end) {
+    public AutoShootAction(double start, double end) {
         super(start, end);
     }
 

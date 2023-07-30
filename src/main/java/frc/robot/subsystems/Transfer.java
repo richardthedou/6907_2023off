@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class Transfer extends Subsystem {
 
     private Omron bottom_omron;
+    private Omron top_omron;
     private PicoColorSensor top_colorsensor;
 
     public enum TransferState {
@@ -62,7 +63,6 @@ public class Transfer extends Subsystem {
         mIntakeCentralizer = new TalonSRX(Constants.Intaker_Centralizer_ID);
         mIntakeFeeder = new TalonFX(Constants.Intaker_Feeder_ID);
 
-
         mTransfer.configFactoryDefault();
         mIntakeFeeder.configFactoryDefault();
         mIntakeCentralizer.configFactoryDefault();
@@ -94,6 +94,7 @@ public class Transfer extends Subsystem {
         top_colorsensor.initializeColorMatch(red, blue);
 
         bottom_omron = new Omron(Constants.Transfer_Bottom_Omron_ID);
+        top_omron = new Omron(Constants.Transfer_Top_Omron_ID);
 
         stop();
     }
@@ -124,7 +125,9 @@ public class Transfer extends Subsystem {
         mPeriodicIO.top_raw_color = top_colorsensor.getColor1();
         mPeriodicIO.top_color = mPeriodicIO.top_proximity > 300 ? top_colorsensor.getMatchedColor(mPeriodicIO.top_raw_color): Alliance.Invalid;
 
-        mPeriodicIO.top_detected = mPeriodicIO.top_proximity> 300;
+        // mPeriodicIO.top_detected = mPeriodicIO.top_proximity> 300;
+        mPeriodicIO.top_detected = top_omron.update();
+
         mPeriodicIO.bottom_omron_detected = bottom_omron.update();
         mPeriodicIO.bottom_omron_T_to_F = bottom_omron.fromTtoF();
         mPeriodicIO.bottom_omron_F_to_T = bottom_omron.fromFtoT();
@@ -189,7 +192,11 @@ public class Transfer extends Subsystem {
         } else if (mIntakerState == IntakerState.OUTTAKE) {
             return TransferState.OUTTAKING;
         } else if (mSSState == SuperStructureState.SHOOTING) {
-            return TransferState.DELIVERING;
+            if (SwerveDrive.getInstance().getVelMS().getTranslation().getNorm() > 0.1) {
+                return TransferState.PREPARE_TO_SHOOT;
+            } else {
+                return TransferState.DELIVERING;
+            }
         } else if (mIntakerState == IntakerState.INTAKE) {
             intake_last_timestamp = timestamp;
             return TransferState.INTAKING;
@@ -281,7 +288,7 @@ public class Transfer extends Subsystem {
             SmartDashboard.putNumber("Transfer: Output Perc", mPeriodicIO.transfer_outperc);
             SmartDashboard.putBoolean("Transfer: bottom omron", mPeriodicIO.bottom_omron_detected);
             SmartDashboard.putString("Transfer: top color", mPeriodicIO.top_color.toString());
-            SmartDashboard.putNumber("Tranfer: Top Proximity", mPeriodicIO.top_proximity);
+            SmartDashboard.putBoolean("Tranfer: Top Detected", mPeriodicIO.top_detected);
             SmartDashboard.putNumber("Transfer: demand", mPeriodicIO.transfer_demand);
             SmartDashboard.putNumber("Transfer: Centralizer Demand", mPeriodicIO.centralizer_demand);
             SmartDashboard.putString("Transfer: state", mTransferState.toString());

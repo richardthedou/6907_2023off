@@ -13,52 +13,48 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import frc.lib6907.auto.AutoMode;
 import frc.lib6907.geometry.GPose2d;
 import frc.robot.auto.actions.IntakeAction;
-import frc.robot.auto.actions.IntakeHoldAction;
 import frc.robot.auto.actions.IntakeHomeAction;
 import frc.robot.auto.actions.OuttakeAction;
 import frc.robot.auto.actions.PathFollowAction;
-import frc.robot.auto.actions.ShootManualAction;
 import frc.robot.auto.actions.AutoShootAction;
 import frc.robot.auto.actions.PathFollowAction.PathFollowConfig;
 import frc.robot.auto.actions.PathFollowAction.RotateMethod;
 import frc.robot.subsystems.SwerveDriveModule;
-import frc.robot.util.ShootingParameters;
 
-public class L2O2XMode extends AutoMode {
+public class R4OMode extends AutoMode {
 
-    public L2O2XMode() {
+    public R4OMode() {
         super(new GPose2d());
 
-        //get Ball 2
-        addAction(new PathFollowAction(1.0, 3.0, getStartToBall2()));
+        //get Ball 4
+        addAction(new PathFollowAction(1.0, 2.5, getStartToBall4()));
         addAction(new IntakeAction(1.0, 1.1));
-        addAction(new IntakeHomeAction(3.0, 3.1));
+        addAction(new IntakeHomeAction(2.5, 2.6));
 
-        //shoot Ball 2 and Preload
-        addAction(new ShootManualAction(0.1, 5.0, new ShootingParameters(12300, 9000, -33)));
 
-        //get Ball 1
-        addAction(new PathFollowAction(4.5, 7.0, getBall2ToBall3()));
+        //shoot Ball 4 and Preload
+        addAction(new AutoShootAction(0.1, 5.0));
+
+        //get Ball Terminal
+        addAction(new PathFollowAction(5.0, 7.5, getBall4ToTerminal()));
         addAction(new IntakeAction(5.5, 5.6));
-        addAction(new IntakeHomeAction(7.4, 7.5));
+        addAction(new IntakeHomeAction(10.0, 10.1));
 
 
-        //get Ball 3
-        addAction(new PathFollowAction(8.0, 10.2, getBall3ToBall1()));
-        addAction(new IntakeAction(9.0, 9.1));
-        addAction(new IntakeHoldAction(11.0, 11.1));
+        //shoot Ball Terminal
+        addAction(new PathFollowAction(10.0, 13.0, getTerminalToShoot()));
+        addAction(new AutoShootAction(12.5, 15.0));
 
-        addAction(new PathFollowAction(11.0, 13.0, getBall1ToHide()));
-        addAction(new OuttakeAction(13.0, 15.1));
+
 
     }
 
     
-    //1.21s
-    private PathFollowConfig getStartToBall2() {
+    //1.29s
+    private PathFollowConfig getStartToBall4() {
         PathFollowConfig pathConfig = new PathFollowConfig();
 
-        pathConfig.trajectory = PathPlanner.loadPath("Left Start To Ball 2", new PathConstraints(4.0, 2));
+        pathConfig.trajectory = PathPlanner.loadPath("Right Start To Ball 4", new PathConstraints(4.0, 3));
         pathConfig.setInitPose = true;
         pathConfig.resetHeading = true;
         pathConfig.startHeading = 0.0;
@@ -69,11 +65,11 @@ public class L2O2XMode extends AutoMode {
         return pathConfig;
     }
     
-    //2.37s
-    private PathFollowConfig getBall2ToBall3() {
+    //2.30s
+    private PathFollowConfig getBall4ToTerminal() {
         PathFollowConfig pathConfig = new PathFollowConfig();
 
-        pathConfig.trajectory = PathPlanner.loadPath("Ball 2 To Ball 3", new PathConstraints(4.0, 2));
+        pathConfig.trajectory = PathPlanner.loadPath("Ball 4 To Terminal", new PathConstraints(4.0, 3));
         pathConfig.setInitPose = false;
         pathConfig.resetHeading = false;
         pathConfig.startHeading = 0.0;
@@ -84,26 +80,11 @@ public class L2O2XMode extends AutoMode {
         return pathConfig;
     }
     
-    //2.14s
-    private PathFollowConfig getBall3ToBall1() {
+    //2.85s
+    private PathFollowConfig getTerminalToShoot() {
         PathFollowConfig pathConfig = new PathFollowConfig();
 
-        pathConfig.trajectory = PathPlanner.loadPath("Ball 3 To Ball 1", new PathConstraints(4.0, 2));
-        pathConfig.setInitPose = false;
-        pathConfig.resetHeading = false;
-        pathConfig.startHeading = 0.0;
-        pathConfig.endHeading = 0.0;
-        pathConfig.rotateDelay = 0.1;
-        pathConfig.mRotateMethod = RotateMethod.PROFILE;
-
-        return pathConfig;
-    }
-
-    //1.95s
-    private PathFollowConfig getBall1ToHide(){
-        PathFollowConfig pathConfig = new PathFollowConfig();
-
-        pathConfig.trajectory = PathPlanner.loadPath("Ball 1 To Hide", new PathConstraints(4.0, 2));
+        pathConfig.trajectory = PathPlanner.loadPath("Terminal To Shoot", new PathConstraints(4.0, 3));
         pathConfig.setInitPose = false;
         pathConfig.resetHeading = false;
         pathConfig.startHeading = 0.0;

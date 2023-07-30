@@ -31,7 +31,7 @@ public class OuttakeAction extends Action {
 
     @Override
     public void end() {
-        Intaker.getInstance().setHome();
+
     }
 
 }

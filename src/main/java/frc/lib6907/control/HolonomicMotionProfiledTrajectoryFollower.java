@@ -40,7 +40,7 @@ public class HolonomicMotionProfiledTrajectoryFollower extends HolonomicTrajecto
         strafeController.setSetpoint(state.poseMeters.getY());
 
 
-        double[] control_output = new double[]{forwardController.calculate(currPose.getTranslation().getX(), dt) + feedforwardVector.getX(),strafeController.calculate(currPose.getTranslation().getY(), dt) + feedforwardVector.getY(),state.holonomicAngularVelocityRadPerSec};
+        double[] control_output = new double[]{forwardController.calculate(currPose.getTranslation().getX(), dt) + feedforwardVector.getX(),strafeController.calculate(currPose.getTranslation().getY(), dt) + feedforwardVector.getY(), state.holonomicRotation.getDegrees()};
         return control_output;
     }
 

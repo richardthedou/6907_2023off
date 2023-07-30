@@ -212,7 +212,7 @@ public class Intaker extends Subsystem {
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK;
                 mPeriodicIO.roller_mode = ControlMode.Velocity;
-                mPeriodicIO.roller_demand = 5000;
+                mPeriodicIO.roller_demand = 6500;
 
                 break;
             case INTAKE_FOR_HOLD:

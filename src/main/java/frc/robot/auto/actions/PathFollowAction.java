@@ -16,7 +16,6 @@ public class PathFollowAction extends Action {
 
     private double timesft;
     private PathFollowConfig mConfig;
-    private boolean transformForAlliance = false;
 
     public enum RotateMethod {
         PROFILE, LIMELIGHT, AUTO_LOCK_TARGET, PIXY
@@ -35,10 +34,9 @@ public class PathFollowAction extends Action {
 
     }
 
-    public PathFollowAction(double start, double end, PathFollowConfig config, boolean transformForAlliance) {
+    public PathFollowAction(double start, double end, PathFollowConfig config) {
         super(start, end);
         mConfig = config;
-        this.transformForAlliance = transformForAlliance;
 
         switch (config.mRotateMethod) {
             case AUTO_LOCK_TARGET:
@@ -55,9 +53,6 @@ public class PathFollowAction extends Action {
 
     @Override
     public void start() {
-        if(transformForAlliance){
-            mConfig.trajectory = PathPlannerTrajectory.transformTrajectoryForAlliance((PathPlannerTrajectory) mConfig.trajectory, DriverStation.getAlliance());
-        }
         SwerveDrive.getInstance().setFollowTrajectory(mConfig);
         SwerveDrive.getInstance().m_field.getObject("traj").setTrajectory(mConfig.trajectory);
         timesft = Timer.getFPGATimestamp();

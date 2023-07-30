@@ -117,7 +117,7 @@ public class SwerveDrive extends Subsystem {
     private Trajectory mTrajectory;
     private double mTrajStartTime;
     private HolonomicFeedforward swerveFF = new HolonomicFeedforward(new SimpleMotorFeedforward(0, 0.23, 0));
-    private SynchronousPIDF translationPIDF = new SynchronousPIDF(1.0, 0.0, 0.0, 0.0);
+    private SynchronousPIDF translationPIDF = new SynchronousPIDF(0.5, 0.0, 0.0, 0.0);
     private HolonomicTrajectoryFollower mTrajectoryFollower = new HolonomicMotionProfiledTrajectoryFollower(
             translationPIDF, swerveFF);
     private PathPlannerState autoTargeState = new PathPlannerState();
@@ -419,6 +419,8 @@ public class SwerveDrive extends Subsystem {
         // field_oriented
         double[] ret = mTrajectoryFollower.calculateDrivePercOutput(mCenterPose, curr_t, dt);
         Translation2d autoDriveOutput = new Translation2d(ret[0], ret[1]);
+
+        rotate(ret[2]);
     
         if (Double.isNaN(autoDriveOutput.getX()))
             autoDriveOutput = new Translation2d(0.0, autoDriveOutput.getY());
