@@ -19,7 +19,7 @@ public class Shooter extends Subsystem {
     private static final int VELRANGE_MAXCNT = 5;
     private static final double VELRANGE_THRESHOLD = 0.3;
     private static final double SPIN_PERC = 0.95;
-    private static final double IDLE_PERC = 0.2; 
+    private static final double IDLE_PERC = 0.0; 
     public static final double MAX_VELADJ_PERC = 0.04;
     public static final double ALLOWABLE_ERROR = 150.0;
 

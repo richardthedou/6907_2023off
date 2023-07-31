@@ -221,8 +221,8 @@ public class Intaker extends Subsystem {
                 mIntakeExtend.configMotionCruiseVelocity(3000);
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK;
-                mPeriodicIO.roller_mode = ControlMode.PercentOutput;
-                mPeriodicIO.roller_demand = 0.27;
+                mPeriodicIO.roller_mode = ControlMode.Velocity;
+                mPeriodicIO.roller_demand = 6500;
                 break;
             case HOLDBALL:
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
