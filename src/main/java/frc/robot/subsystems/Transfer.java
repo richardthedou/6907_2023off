@@ -192,7 +192,7 @@ public class Transfer extends Subsystem {
         } else if (mIntakerState == IntakerState.OUTTAKE) {
             return TransferState.OUTTAKING;
         } else if (mSSState == SuperStructureState.SHOOTING) {
-            if (SwerveDrive.getInstance().getVelMS().getTranslation().getNorm() > 0.1) {
+            if (SwerveDrive.getInstance().getVelMS().getTranslation().getNorm() > 0.5) {
                 return TransferState.PREPARE_TO_SHOOT;
             } else {
                 return TransferState.DELIVERING;

@@ -141,15 +141,13 @@ public class Constants {
     static {
         kHighShooterMap.put(new InterpolatingDouble(1.5), new InterpolatingDouble(8000.0)); //8500
         kHighShooterMap.put(new InterpolatingDouble(1.8), new InterpolatingDouble(8300.0)); //8500
-        kHighShooterMap.put(new InterpolatingDouble(2.3), new InterpolatingDouble(8700.0));
+        kHighShooterMap.put(new InterpolatingDouble(2.3), new InterpolatingDouble(8500.0));
         kHighShooterMap.put(new InterpolatingDouble(3.0), new InterpolatingDouble(8800.0));
         kHighShooterMap.put(new InterpolatingDouble(3.5), new InterpolatingDouble(8800.0));
         kHighShooterMap.put(new InterpolatingDouble(3.8), new InterpolatingDouble(8900.0));
         kHighShooterMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(9600.0));
-        kHighShooterMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(12000.0));
-        
-
-      
+        kHighShooterMap.put(new InterpolatingDouble(5.5), new InterpolatingDouble(10400.0));
+        kHighShooterMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(11500.0));
 
     }
     

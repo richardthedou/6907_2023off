@@ -91,7 +91,7 @@ public class Intaker extends Subsystem {
         mIntakeExtend.configClosedLoopPeakOutput(0, 0.15, 10);
         mIntakeExtend.configAllowableClosedloopError(0, 0, 10);
         mIntakeExtend.configMotionCruiseVelocity(3000, 10);
-        mIntakeExtend.configMotionAcceleration(3000, 10);
+        mIntakeExtend.configMotionAcceleration(4500, 10);
 
         mIntakeExtend.configNeutralDeadband(0.001);
 
@@ -212,7 +212,9 @@ public class Intaker extends Subsystem {
                 mPeriodicIO.extend_mode = ControlMode.MotionMagic;
                 mPeriodicIO.extend_demand = EXTEND_TICK;
                 mPeriodicIO.roller_mode = ControlMode.Velocity;
+                // mPeriodicIO.roller_demand = mPeriodicIO.extend_pos > 200 ? 6500 : 0;
                 mPeriodicIO.roller_demand = 6500;
+
 
                 break;
             case INTAKE_FOR_HOLD:
