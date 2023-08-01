@@ -1,5 +1,6 @@
 package frc.robot.devices;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib6907.geometry.GTranslation2d;
@@ -12,6 +13,8 @@ public class ControlInput {
     private final XboxController mOperator = new XboxController(Constants.OPERATORIO_PORT);
 
     private GTranslation2d drive_vector;
+    private GTranslation2d operator_left;
+
     private double drive_targetAngle, drive_rawRate;
     private static ControlInput sInstance;
     private boolean pigeonReset;
@@ -47,6 +50,7 @@ public class ControlInput {
 
     private ControlInput() {
         drive_vector = new GTranslation2d();
+        operator_left = new GTranslation2d();
     }
 
     public synchronized void updateInput() {
@@ -74,10 +78,13 @@ public class ControlInput {
         } else {
             manualTurret = Double.NaN;
         }
+
+        operator_left = new GTranslation2d(mOperator.getLeftX(), mOperator.getLeftY());
         
         //climb
         climb_up = mOperator.getPOV() == 0;
         climb_down = mOperator.getPOV() == 180;
+
 
     }
 
@@ -112,6 +119,17 @@ public class ControlInput {
 
     public boolean getFixedShooter() {
         return fixedShoot;
+    }
+
+    public boolean getSouthShoot1() {
+        return Math.abs(operator_left.direction().getDegrees() - 180) < 5;
+    }
+
+    public boolean getSouthShoot2() {
+        return Math.abs(operator_left.direction().getDegrees() - 90) < 5;
+    }
+    public boolean getSouthShoot3() {
+        return Math.abs(operator_left.direction().getDegrees() - 0) < 5;
     }
     
     //intaker

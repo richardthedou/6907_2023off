@@ -228,7 +228,15 @@ public class Robot extends TimedRobot {
 				mSuperStructure.setWantShoot(new ShootingParameters(8000, 5500, 0));
 			} else if (mControlInput.getVisionShoot()) {
 				mSuperStructure.setWantShootVision();
-			} else {
+			} else if (mControlInput.getSouthShoot1()){
+				mSuperStructure.setWantShoot(new ShootingParameters(30000, 5500, 180));
+			}else if (mControlInput.getSouthShoot2()){
+				mSuperStructure.setWantShoot(new ShootingParameters(30000, 7000, 180));
+			}else if (mControlInput.getSouthShoot3()){
+				mSuperStructure.setWantShoot(new ShootingParameters(30000, 8500, 180));
+			}
+			
+			else {
 				mSuperStructure.stop();
 			}
 

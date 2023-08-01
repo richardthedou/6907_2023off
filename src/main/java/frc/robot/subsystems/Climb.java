@@ -192,16 +192,16 @@ public class Climb extends Subsystem {
     }
 
     public synchronized void setClimb(double target) {
-        if (calibrated && state != ClimbState.CLIMBING){
+        if (calibrated && state != ClimbState.CLIMBING) {
             state = ClimbState.CLIMBING;
-            Turret.getInstance().setAngle(0, 0);
-            mPIO.turret_desiredpos = target;
-            if (target < 10000) {
-                mFX.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.1));
-            } else {
-                mFX.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1));
+        }
+        Turret.getInstance().setAngle(0, 0);
+        mPIO.turret_desiredpos = target;
+        if (target < 10000) {
+            mFX.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.1));
+        } else {
+            mFX.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1));
 
-            }
         }
     }
     
