@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib6907.geometry.GRotation2d;
@@ -15,7 +16,7 @@ import frc.robot.util.ShootingParameters;
 public class SuperStructure extends Subsystem {
 
     public enum SuperStructureState {
-        STOP, AIMING, SHOOTING
+        STOP, AIMING, SHOOTING, Reverse
     }
 
     private Shooter mShooter = Shooter.getInstance();
@@ -77,6 +78,8 @@ public class SuperStructure extends Subsystem {
                         case SHOOTING:
                             newState = handleShooting(wantedState);
                             break;
+                        case Reverse:
+                            newState = wantedState;
                         default:
                             break;
 
@@ -98,6 +101,8 @@ public class SuperStructure extends Subsystem {
                         case SHOOTING:
                             writeShootDesiredState(timestamp);
                             break;
+                        case Reverse:
+                            writeReverseDesiredState(timestamp);
                         default:
                             break;
 
@@ -128,6 +133,7 @@ public class SuperStructure extends Subsystem {
         }
     }
 
+
     private SuperStructureState handleAiming(SuperStructureState wantedState, double timestamp) {
         switch (wantedState) {
             case STOP:
@@ -148,7 +154,7 @@ public class SuperStructure extends Subsystem {
                 } else if (Double.isFinite(nextScheduledShotTime) && timestamp < nextScheduledShotTime) {
                     return SuperStructureState.AIMING;
                 }
-                
+
                 //if no scheduled shot
                 if (isReadyToShoot() && (!lowhub() || !getLowHubShootBlocked())) {
                     return SuperStructureState.SHOOTING;
@@ -158,13 +164,14 @@ public class SuperStructure extends Subsystem {
         }
     }
 
+
     private SuperStructureState handleShooting(SuperStructureState wantedState) {
         switch (wantedState) {
             case AIMING:
                 return SuperStructureState.AIMING;
             case SHOOTING:
             default:
-                if (!isReadyToShoot()) {
+                if (!isReadyToShoot() && Shooter.getInstance().getVelocityReached()) {
                     return SuperStructureState.AIMING;
                 }else{
                     return SuperStructureState.SHOOTING;
@@ -178,6 +185,11 @@ public class SuperStructure extends Subsystem {
         mHood.stop();
         mShooter.setIdle();
         // Turret not stoped because of manual adjustment and lock field rel direction
+    }
+
+    private void writeReverseDesiredState(double timestamp) {
+        mHood.stop();
+        mShooter.setReverse();
     }
 
     private boolean tolerable = false;
@@ -301,6 +313,10 @@ public class SuperStructure extends Subsystem {
         mWantedState = SuperStructureState.AIMING;
         this.mVisionAiming = true;
         this.shoot_low_hub = low_hub;
+    }
+
+    public synchronized void setWantReverse() {
+        mWantedState = SuperStructureState.Reverse;
     }
 
     //schedule shoot in autonomous mode

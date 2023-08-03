@@ -234,9 +234,9 @@ public class Robot extends TimedRobot {
 				mSuperStructure.setWantShoot(new ShootingParameters(30000, 7000, 180));
 			}else if (mControlInput.getSouthShoot3()){
 				mSuperStructure.setWantShoot(new ShootingParameters(30000, 8500, 180));
-			}
-			
-			else {
+			} else if (mControlInput.getOuttake()) {
+				mSuperStructure.setWantReverse();
+			} else {
 				mSuperStructure.stop();
 			}
 

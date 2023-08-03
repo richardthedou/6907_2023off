@@ -27,7 +27,7 @@ public class Shooter extends Subsystem {
             VEL_kI = 0.02,
             VEL_kD = 1000,
             VEL_kF = 0.0492;
-    private static final double CLOSE_SPIN_RAMP = 1.5, // >= 1.5
+    private static final double CLOSE_SPIN_RAMP = 0.5, // >= 1.5
             CLOSE_HOLD_RAMP = 0.15;
 
     public enum ShooterState {
@@ -137,6 +137,8 @@ public class Shooter extends Subsystem {
             mShooterRight.set(ControlMode.Velocity, veldemand);
         else if (mShooterState == ShooterState.IDLE) {
             mShooterRight.set(ControlMode.PercentOutput, IDLE_PERC);
+        }else if(mShooterState == ShooterState.Reverse){
+            mShooterRight.set(ControlMode.PercentOutput, -0.15);
         }else{
             mShooterRight.set(ControlMode.PercentOutput, 0.0);
         }
@@ -220,6 +222,13 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized void setIdle() {
+        if (mShooterState != ShooterState.IDLE) {
+            mShooterState = ShooterState.IDLE;
+        }
+        setRamp(true);
+    }
+
+    public synchronized void setReverse() {
         if (mShooterState != ShooterState.IDLE) {
             mShooterState = ShooterState.IDLE;
         }
